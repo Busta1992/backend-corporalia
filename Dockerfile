@@ -9,7 +9,8 @@ RUN mvn dependency:go-offline
 
 # Copiamos el resto del código y construimos el jar
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN mvn clean package spring-boot:repackage -DskipTests
+
 
 # Segunda etapa: imagen para correr solo el jar, más ligera
 FROM eclipse-temurin:21-jre-alpine
