@@ -54,37 +54,70 @@ public class BBDDService {
         BBDD existingBBDD = bbddRepository.findById(codigo)
                 .orElseThrow(() -> new RuntimeException("No se encontró el registro con el código: " + codigo));
 
-        existingBBDD.setClub(bbddDTO.getClub());
-        existingBBDD.setCp(bbddDTO.getCp());
-        existingBBDD.setDireccion(bbddDTO.getDireccion());
-        existingBBDD.setMunicipio(bbddDTO.getMunicipio());
-        existingBBDD.setObservacion(bbddDTO.getObservacion());
-        existingBBDD.setProvincia(bbddDTO.getProvincia());
-        existingBBDD.setCampania(bbddDTO.getCampania());
-
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        boolean hayCambios = false;
 
-        System.out.println("--------- INTENTO DE ACTUALIZACIÓN ---------");
-        System.out.println("Recibido DTO:");
-        System.out.println("codigo: " + bbddDTO.getCodigo());
-        System.out.println("fechaInicio: " + bbddDTO.getFechaInicio());
-        System.out.println("fechaFin: " + bbddDTO.getFechaFin());
-
-        if (bbddDTO.getFechaInicio() != null && !bbddDTO.getFechaInicio().isEmpty()) {
-            existingBBDD.setFechaInicio(LocalDateTime.parse(bbddDTO.getFechaInicio(), formatter));
-        } else {
-            existingBBDD.setFechaInicio(null);
+        if (!equals(existingBBDD.getClub(), bbddDTO.getClub())) {
+            existingBBDD.setClub(bbddDTO.getClub());
+            hayCambios = true;
+        }
+        if (!equals(existingBBDD.getCp(), bbddDTO.getCp())) {
+            existingBBDD.setCp(bbddDTO.getCp());
+            hayCambios = true;
+        }
+        if (!equals(existingBBDD.getDireccion(), bbddDTO.getDireccion())) {
+            existingBBDD.setDireccion(bbddDTO.getDireccion());
+            hayCambios = true;
+        }
+        if (!equals(existingBBDD.getMunicipio(), bbddDTO.getMunicipio())) {
+            existingBBDD.setMunicipio(bbddDTO.getMunicipio());
+            hayCambios = true;
+        }
+        if (!equals(existingBBDD.getObservacion(), bbddDTO.getObservacion())) {
+            existingBBDD.setObservacion(bbddDTO.getObservacion());
+            hayCambios = true;
+        }
+        if (!equals(existingBBDD.getProvincia(), bbddDTO.getProvincia())) {
+            existingBBDD.setProvincia(bbddDTO.getProvincia());
+            hayCambios = true;
+        }
+        if (!equals(existingBBDD.getCampania(), bbddDTO.getCampania())) {
+            existingBBDD.setCampania(bbddDTO.getCampania());
+            hayCambios = true;
         }
 
+        // Fecha inicio
+        LocalDateTime nuevaFechaInicio = null;
+        if (bbddDTO.getFechaInicio() != null && !bbddDTO.getFechaInicio().isEmpty()) {
+            nuevaFechaInicio = LocalDateTime.parse(bbddDTO.getFechaInicio(), formatter);
+        }
+        if (!equals(existingBBDD.getFechaInicio(), nuevaFechaInicio)) {
+            existingBBDD.setFechaInicio(nuevaFechaInicio);
+            hayCambios = true;
+        }
+
+        // Fecha fin
+        LocalDateTime nuevaFechaFin = null;
         if (bbddDTO.getFechaFin() != null && !bbddDTO.getFechaFin().isEmpty()) {
-            existingBBDD.setFechaFin(LocalDateTime.parse(bbddDTO.getFechaFin(), formatter));
-        } else {
-            existingBBDD.setFechaFin(null);
+            nuevaFechaFin = LocalDateTime.parse(bbddDTO.getFechaFin(), formatter);
+        }
+        if (!equals(existingBBDD.getFechaFin(), nuevaFechaFin)) {
+            existingBBDD.setFechaFin(nuevaFechaFin);
+            hayCambios = true;
+        }
+
+        if (!hayCambios) {
+            // No se modificó nada
+            return new BBDDDTO(existingBBDD);
         }
 
         BBDD updatedBBDD = bbddRepository.save(existingBBDD);
         return new BBDDDTO(updatedBBDD);
+    }
+
+    // Método auxiliar para comparar con null safety
+    private boolean equals(Object a, Object b) {
+        return (a == null && b == null) || (a != null && a.equals(b));
     }
 
     public void deleteByCodigo(String codigo) {
