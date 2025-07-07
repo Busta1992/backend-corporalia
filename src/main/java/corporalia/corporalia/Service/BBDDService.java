@@ -31,12 +31,6 @@ public class BBDDService {
     }
 
     public BBDDDTO save(BBDDDTO bbddDTO) {
-        System.out.println("--------- INTENTO DE GUARDADO ---------");
-        System.out.println("Recibido DTO:");
-        System.out.println("codigo: " + bbddDTO.getCodigo());
-        System.out.println("fechaInicio: " + bbddDTO.getFechaInicio());
-        System.out.println("fechaFin: " + bbddDTO.getFechaFin());
-
         if (bbddDTO.getCodigo() == null || bbddDTO.getCodigo().trim().isEmpty()) {
             throw new RuntimeException("El campo 'codigo' es obligatorio para guardar.");
         }
@@ -86,7 +80,6 @@ public class BBDDService {
             hayCambios = true;
         }
 
-        // Fecha inicio
         LocalDateTime nuevaFechaInicio = null;
         if (bbddDTO.getFechaInicio() != null && !bbddDTO.getFechaInicio().isEmpty()) {
             nuevaFechaInicio = LocalDateTime.parse(bbddDTO.getFechaInicio(), formatter);
@@ -96,7 +89,6 @@ public class BBDDService {
             hayCambios = true;
         }
 
-        // Fecha fin
         LocalDateTime nuevaFechaFin = null;
         if (bbddDTO.getFechaFin() != null && !bbddDTO.getFechaFin().isEmpty()) {
             nuevaFechaFin = LocalDateTime.parse(bbddDTO.getFechaFin(), formatter);
@@ -106,8 +98,12 @@ public class BBDDService {
             hayCambios = true;
         }
 
+        if (!equals(existingBBDD.getColor(), bbddDTO.getColor())) {
+            existingBBDD.setColor(bbddDTO.getColor());
+            hayCambios = true;
+        }
+
         if (!hayCambios) {
-            // No se modificó nada
             return new BBDDDTO(existingBBDD);
         }
 
@@ -115,7 +111,6 @@ public class BBDDService {
         return new BBDDDTO(updatedBBDD);
     }
 
-    // Método auxiliar para comparar con null safety
     private boolean equals(Object a, Object b) {
         return (a == null && b == null) || (a != null && a.equals(b));
     }
@@ -133,6 +128,19 @@ public class BBDDService {
     public List<BBDDDTO> findByProvincia(String provincia) {
         return bbddRepository.findByProvincia(provincia)
                 .stream()
+                .map(BBDDDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    // ✅ NUEVO: Guardado directo en lote (sin comparación)
+    public List<BBDDDTO> saveBulkDirecto(List<BBDDDTO> dtos) {
+        List<BBDD> entidades = dtos.stream()
+                .map(BBDDDTO::toEntity)
+                .collect(Collectors.toList());
+
+        List<BBDD> guardados = bbddRepository.saveAll(entidades);
+
+        return guardados.stream()
                 .map(BBDDDTO::new)
                 .collect(Collectors.toList());
     }
