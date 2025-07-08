@@ -24,6 +24,8 @@ public class FabricaMobiliarioService {
         return new Mobiliario(dto);
     }
 
+
+
     public MobiliarioDTO escribirMobiliarioDTO(Mobiliario entity) {
         if (entity == null) {
             logger.error("La entidad proporcionada es nula");

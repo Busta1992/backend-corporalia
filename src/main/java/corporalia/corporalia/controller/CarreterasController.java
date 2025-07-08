@@ -18,7 +18,6 @@ public class CarreterasController {
     @Autowired
     private CarreterasService carreterasService;
 
-    // Obtiene todos los registros
     @GetMapping
     public ResponseEntity<List<CarreterasDTO>> findAll() {
         return ResponseEntity.ok(carreterasService.findAll());
@@ -39,7 +38,6 @@ public class CarreterasController {
         return ResponseEntity.ok(carreterasService.findByNFlota(nFlota));
     }
 
-    // Crea un nuevo registro
     @PostMapping
     public ResponseEntity<CarreterasDTO> save(@RequestBody CarreterasDTO carreterasDTO) {
         System.out.println("========= ENTRADA EN CONTROLLER =========");
@@ -48,8 +46,12 @@ public class CarreterasController {
         return ResponseEntity.ok(carreterasService.save(carreterasDTO));
     }
 
+    // ✅ NUEVO: Guardado en lote (bulk-fast)
+    @PostMapping("/bulk-fast")
+    public ResponseEntity<List<CarreterasDTO>> saveBulkFast(@RequestBody List<CarreterasDTO> dtos) {
+        return ResponseEntity.ok(carreterasService.saveBulkDirecto(dtos));
+    }
 
-    // Actualiza un registro existente por su código
     @PutMapping("/{nFLota}")
     public ResponseEntity<CarreterasDTO> update(@PathVariable String nFLota, @RequestBody CarreterasDTO carreterasDTO) {
         return ResponseEntity.ok(carreterasService.update(nFLota, carreterasDTO));
@@ -60,5 +62,4 @@ public class CarreterasController {
         carreterasService.deleteByNFlota(String.valueOf(nFlota));
         return ResponseEntity.noContent().build();
     }
-
 }

@@ -66,6 +66,8 @@ public class MobiliarioDTO {
             this.color = mobiliario.getColor();
         }
     }
-    }
+
+
+}
 
 

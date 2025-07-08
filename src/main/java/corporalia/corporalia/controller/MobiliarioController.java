@@ -19,7 +19,6 @@ public class MobiliarioController {
     @Autowired
     private MobiliarioService mobiliarioService;
 
-    // Obtiene todos los registros
     @GetMapping
     public ResponseEntity<List<MobiliarioDTO>> findAll() {
         return ResponseEntity.ok(mobiliarioService.findAll());
@@ -29,9 +28,6 @@ public class MobiliarioController {
     public ResponseEntity<List<MobiliarioDTO>> obtenerPorMunicipio(@PathVariable String municipio) {
         return ResponseEntity.ok(mobiliarioService.obtenerPorMunicipio(municipio));
     }
-
-
-
 
     @GetMapping("/provincia/{provincia}")
     public ResponseEntity<List<MobiliarioDTO>> findByProvincia(@PathVariable String provincia) {
@@ -43,7 +39,6 @@ public class MobiliarioController {
         return ResponseEntity.ok(mobiliarioService.findByCodigo(codigo));
     }
 
-    // Crea un nuevo registro
     @PostMapping
     public ResponseEntity<MobiliarioDTO> save(@RequestBody MobiliarioDTO mobiliarioDTO) {
         System.out.println("========= ENTRADA EN CONTROLLER =========");
@@ -52,8 +47,12 @@ public class MobiliarioController {
         return ResponseEntity.ok(mobiliarioService.save(mobiliarioDTO));
     }
 
+    // ✅ NUEVO: Guardado en lote (bulk-fast)
+    @PostMapping("/bulk-fast")
+    public ResponseEntity<List<MobiliarioDTO>> saveBulkFast(@RequestBody List<MobiliarioDTO> dtos) {
+        return ResponseEntity.ok(mobiliarioService.saveBulkDirecto(dtos));
+    }
 
-    // Actualiza un registro existente por su código
     @PutMapping("/{codigo}")
     public ResponseEntity<MobiliarioDTO> update(@PathVariable String codigo, @RequestBody MobiliarioDTO mobiliarioDTO) {
         return ResponseEntity.ok(mobiliarioService.update(codigo, mobiliarioDTO));
